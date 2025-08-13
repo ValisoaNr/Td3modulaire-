@@ -13,6 +13,7 @@
 	Ecrire un programme C qui permet de remplir et déterminer si un carré est magique ou non.
 */
 #include<stdio.h>
+#include<stdlib.h>
 #define TAILLE_MAX 100
 
 void presentation();
@@ -27,9 +28,9 @@ int main ()
 	int taille,magique;
 
 	presentation();
-	taille=recupTaille();
+	taille = recupTaille();
 	recupElement(taille,carree);
-	magique=testMagique(taille,carree);//return 1 si c'est un carree magique
+	magique = testMagique(taille,carree);//return 1 si c'est un carree magique
 	afficheResultat(magique);
 
 	return(0);
@@ -48,6 +49,7 @@ int recupTaille()
 		scanf("%d",&taille);
 	}
 	while(taille<0 || taille>TAILLE_MAX);
+	
 	return (taille);
 }
 void recupElement(int taille, int tableau2D[][taille])
@@ -66,26 +68,43 @@ void recupElement(int taille, int tableau2D[][taille])
 int testMagique(int taille,int tableau2D[][taille])
 {
 	//stocker les sommes des colonnes et aussi des lignes separement pour les  comparer apres
-	int somme[(TAILLE_MAX*2)]={};
+	int *somme;
 	int ligne , colonne , i , iTabSomme , verite ;
 	
-	iTabSomme=0;
+	somme = calloc( ((TAILLE_MAX*2)+2), sizeof(int));
+	//enregistrement des sommes de ligne
+	iTabSomme = 0;
 	for(ligne=0 ; ligne<taille ;ligne++)
 	{
 		for(colonne=0 ; colonne<taille ;colonne++)
 		{
-			somme[iTabSomme]=somme[iTabSomme]+tableau2D[ligne][colonne];
+			somme[iTabSomme] = somme[iTabSomme]+tableau2D[ligne][colonne];
 		}
 		iTabSomme++;
 	}
+	//enregistrement des sommes de colonne
 	for(colonne=0 ; colonne<taille ;colonne++)
 	{
 		for(ligne=0 ; ligne<taille ;ligne++)
 		{
-			somme[iTabSomme]=somme[iTabSomme]+tableau2D[ligne][colonne];
+			somme[iTabSomme] = somme[iTabSomme]+tableau2D[ligne][colonne];
 		}
 		iTabSomme++;
 	}
+	//enregistrement des sommes de diagonale
+	for(i=0; i<taille; i++)
+	{
+		somme[iTabSomme] = somme[iTabSomme] + tableau2D[i][i];
+	}
+	iTabSomme++;
+	// l'autre diagonale
+	ligne = (taille - 1);
+	for(colonne=0; colonne < taille; colonne++)
+	{
+		somme[iTabSomme] = somme[iTabSomme] + tableau2D[ligne][colonne];
+		ligne --;
+	}
+	iTabSomme++;
 
 	//supposons en premier temps que c'est un carre magique
 	verite=1;
@@ -100,6 +119,8 @@ int testMagique(int taille,int tableau2D[][taille])
 			break ;
 		}
 	}
+	free(somme);
+
 	return (verite);
 }
 void afficheResultat(int verite)
